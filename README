@@ -1,4 +1,0 @@
-Java Tools Installers
-=====================
-
-If you ever need to install more than one version of a java application and be able to easily switch between them these scripts to allow you to easily and consistanlly do this.  I maintain several server and find automating these tasks keep me from making mistakes that are often time comsuming to resoleve, pluss no one likes implemting things that dont work correclty.  To this end these script use the `alternatives` command available on Fedora, RHEL, Centos, and others to install each versin in a unique home and simple repoint the home to the desired version.
