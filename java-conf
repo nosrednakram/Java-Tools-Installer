@@ -1,0 +1,27 @@
+#
+# Basic Configuration file example
+#
+# The Options__base_dir is where you want the root of the tools install directory.
+#
+# Each installable configuration file needs to be in the Options__config_dir directory
+#
+# Options__add_apps contains a space delimited list of applictions, if you want to install
+# everything from the APP_CONFIG_DIR you can set it to ALL or to INTERACTIVE if you
+# prefer to be prompted based on the configuration files in the APP_CONFIG_DIR.
+#
+# If Options__debug is set to TRUE debugging processing is output to the screen.
+#
+# Options__source_dir is where the downloaded source will be stored when finished.
+#
+# Options__root_user if set to TRUE will install as root and add to alternatives as
+# well as adding profile scripts in /etc/profile.d
+#
+Options__add_apps=ALL
+Options__base_dir=/opt/java-tools
+Options__config_dir=config-files
+Options__debug=TRUE
+Options__source_dir=source-files
+Options__root_user=FALSE
+
+export Options__add_apps Options__base_dir Options__config_dir Options__debug Options__source_dir Options__root_user
+

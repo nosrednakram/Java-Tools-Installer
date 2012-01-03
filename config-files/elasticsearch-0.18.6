@@ -1,0 +1,10 @@
+APP_NAME=elasticsearch
+ENV_VAR=ES_HOME
+GET_CMD='wget https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.18.6.tar.gz'
+APP_FILE=elasticsearch-0.18.6.tar.gz
+EXTRACT_DIR=elasticsearch-0.18.6
+EXTRACT_CMD="tar -xzf $APP_FILE"
+ALTERNATIVES_VERSION=186
+APP_NOTES="Additional Setup Required for ElasticSearch see:\n\nhttp://www.elasticsearch.org/tutorials/2010/07/01/setting-up-elasticsearch.html\n"
+
+export APP_NAME ENV_VAR GET_CMD APP_FILE EXTRACT_DIR EXTRACT_CMD ALTERNATIVES_VERSION APP_NOTES

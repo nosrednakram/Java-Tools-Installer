@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Mark Anderson" />
+  <meta name="date" content="2012-01-02" />
+  <title>Java Tools Installer</title>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode, table.sourceCode pre 
+   { margin: 0; padding: 0; border: 0; vertical-align: baseline; border: none; }
+td.lineNumbers { border-right: 1px solid #AAAAAA; text-align: right; color: #AAAAAA; padding-right: 5px; padding-left: 5px; }
+td.sourceCode { padding-left: 5px; }
+code.sourceCode span.kw { color: #007020; font-weight: bold; } 
+code.sourceCode span.dt { color: #902000; }
+code.sourceCode span.dv { color: #40a070; }
+code.sourceCode span.bn { color: #40a070; }
+code.sourceCode span.fl { color: #40a070; }
+code.sourceCode span.ch { color: #4070a0; }
+code.sourceCode span.st { color: #4070a0; }
+code.sourceCode span.co { color: #60a0b0; font-style: italic; }
+code.sourceCode span.ot { color: #007020; }
+code.sourceCode span.al { color: red; font-weight: bold; }
+code.sourceCode span.fu { color: #06287e; }
+code.sourceCode span.re { }
+code.sourceCode span.er { color: red; font-weight: bold; }
+  </style>
+<link rel="stylesheet" href="css/master.css" />
+<STYLE type="text/css">
+   .toc li {list-style-type: none }
+   dd {padding: 8px 16px}
+ </STYLE>
+<noscript>
+<link rel="stylesheet" href="css/mobile.min.css" />
+</noscript>
+<script>
+// Edit to suit your needs.
+var ADAPT_CONFIG = {
+  // Where is your CSS?
+  path: 'css/',
+
+  // false = Only run once, when page first loads.
+  // true = Change on window resize and page tilt.
+  dynamic: true,
+
+  // First range entry is the minimum.
+  // Last range entry is the maximum.
+  // Separate ranges by "to" keyword.
+  range: [
+    '0px    to 760px  = mobile.min.css',
+    '760px  to 980px  = 720.min.css',
+    '980px  to 1280px = 960.min.css',
+    '1280px to 1600px = 1200.min.css',
+    '1600px to 1940px = 1560.min.css',
+    '1940px to 2540px = 1920.min.css',
+    '2540px           = 2520.min.css'
+  ]
+};
+</script>
+<script src="js/adapt.min.js"></script>
+</head>
+<body>
+<div class="container_12">
+<div class="grid_3 toc">
+<h3>Table of Contents</h3>
+<nav id="TOC">
+<ul>
+<li><a href="#installing">Installing</a><ul>
+<li><a href="#using-curl">Using curl</a></li>
+<li><a href="#using-git">Using git</a></li>
+</ul></li>
+<li><a href="#user-guide">User Guide</a><ul>
+<li><a href="#design-goals">Design Goals</a></li>
+<li><a href="#optionsdefaults">Options/Defaults</a><ul>
+<li><a href="#a-or---add_app">-a or --add_app</a></li>
+<li><a href="#b-or---base_dir">-b or --base_dir</a></li>
+<li><a href="#c-or---config_dir">-c or --config_dir</a></li>
+<li><a href="#d-or---debug">-d or --debug</a></li>
+<li><a href="#f-or---config_file">-f or --config_file</a></li>
+<li><a href="#h-or---help">-h or --help</a></li>
+<li><a href="#r-or---root_user">-r or --root_user</a></li>
+<li><a href="#s-or---source_dir">-s or --source_dir</a></li>
+</ul></li>
+<li><a href="#examples">Examples</a><ul>
+<li><a href="#example-1">Example 1</a></li>
+<li><a href="#example-2">Example 2</a></li>
+<li><a href="#example-3">Example 3</a></li>
+<li><a href="#example-4">Example 4</a></li>
+</ul></li>
+<li><a href="#tool-specification">Tool Specification</a><ul>
+<li><a href="#app_name">APP_NAME</a></li>
+<li><a href="#env_var">ENV_VAR</a></li>
+<li><a href="#get_cmd">GET_CMD</a></li>
+<li><a href="#app_file">APP_FILE</a></li>
+<li><a href="#extract_dir">EXTRACT_DIR</a></li>
+<li><a href="#extract_cmd">EXTRACT_CMD</a></li>
+<li><a href="#alternatives_version">ALTERNATIVES_VERSION</a></li>
+<li><a href="#app_notes">APP_NOTES</a></li>
+</ul></li>
+<li><a href="#configuration-file">Configuration File</a></li>
+</ul></li>
+<li><a href="#appendix-a-tools">Appendix A (tools)</a></li>
+</ul>
+</nav>
+</div> <!-- Grid 3 -->
+<div class="grid_9">
+<header>
+<h1 class="title">Java Tools Installer</h1>
+</header>
+<p>The Java Tools Installer is a simle script that allow for the consistant and easy installation of defferent java based tools. It's designed to specifically automate the process of installing binary Java tools that have an <em>*_HOME</em> variable. This works for grails, gant, ant, gradle, etc.</p>
+<p>I noticed a consistant pattern with most of them. It consisted of the follow steps for each tool:</p>
+<ul>
+<li>Downloading</li>
+<li>Uncompressing</li>
+<li>Pointing a TOOL_HOME variable to the source directory</li>
+<li>Add to the <strong>alternatives</strong> system</li>
+<li>Create profile scripts that point to the <strong>alternatives</strong> home</li>
+</ul>
+<p>To keep all of my installs consistant for developers, testers and on production machines I felt some automation would be nice. To this end I created the <em>Java Tools Installer</em>, which consists of a bash script that reads configuration files for tools to install and installes them.</p>
+<p>I belive anyone who uses Java based tools and needs to easily and consistantly install them. Spcifically this is benificial to the following for the primary reasons listed as well as more reasons that will be covered below:</p>
+<dl>
+<dt>Developers</dt>
+<dd><p>Uses <strong>alternatives</strong> so developers can easily swich between versions</p>
+</dd>
+<dt>System Administrators</dt>
+<dd><p>Automation keeps systems consistand and speeds up install process.</p>
+</dd>
+<dt>Test/QA</dt>
+<dd><p>Makes build process automation easy so consistant testing is possible.</p>
+</dd>
+</dl>
+<h1 id="installing"><a href="#TOC">Installing</a></h1>
+<h2 id="using-curl"><a href="#TOC">Using curl</a></h2>
+<pre class="sourceCode"><code class="sourceCode bash">curl -L http://github.com/nosrednakram/Java-Tools-Installer/tarball/master <span class="kw">|</span> <span class="kw">tar</span> -xz<br /><span class="kw">mv</span> *nosrednakram-Java-Tools-Installer-* Java-Tools-Installer<br /><span class="kw">cd</span> Java-Tools-Installer<br />./installer.sh</code></pre>
+<h2 id="using-git"><a href="#TOC">Using git</a></h2>
+<pre class="sourceCode"><code class="sourceCode bash">git clone git://github.com/nosrednakram/Java-Tools-Installer.git<br /><span class="kw">cd</span> Java-Tools-Installer<br />./installer.sh</code></pre>
+<p>The installer will use defaults for all opotions and prompt for which tools to install. You should look in the <a href="./user-guide.html" title="User Guide">user guide</a> for more advanced usage and for help on creating configuration files and optional tools installers.</p>
+<h1 id="user-guide"><a href="#TOC">User Guide</a></h1>
+<p>The main goal of this guide is to help you get the most out the <code>Java Tools Installer</code>. It will cover not only usage but also adding additional tools. If your interest is to get up and running as quicklly as possible you can go to the <a href="#installing" title="Installing">installing</a> section of the document and be up and running in minutes. If you want to learn about the more advanced features of the tool continue on.</p>
+<h2 id="design-goals"><a href="#TOC">Design Goals</a></h2>
+<p>Below are the primary goals I keep in mind while working on this script. If you feel I am not achieving any of them please let me know.</p>
+<ul>
+<li>Make installation of Java tools easy</li>
+<li>Automate the process to minimize inconsistancy between systems</li>
+<li>Configure before starting the installs so interaction is not required once it starts installing</li>
+<li>Allow multiple versions of any tool</li>
+<li>Optionally configure to use the <code>alternatives</code> command</li>
+<li>Optionally create profile scripts for installed tools</li>
+<li>Store download source in the event we need to install again</li>
+<li>Use reasonable defaults with several configuration options
+<ul>
+<li>Allow Interactive selection of available install options</li>
+<li>Allow config file selection of available install options</li>
+<li>Allow all config options to be set on the command line.</li>
+</ul></li>
+</ul>
+<h2 id="optionsdefaults"><a href="#TOC">Options/Defaults</a></h2>
+<p>Like most applications help is built in if you need a quick reference. Both short and long options are acceptable as well as allowing all options to be specified in a configuration file, except for the name of the configuratin file that is. This guide will use the long option to hopefully add clarity to the examples.</p>
+<pre class="sourceCode"><code class="sourceCode bash">./installer.sh --help<br />Usage: ./installer.sh<br /><br />Options:<br />   -a or --add_app <span class="kw">&lt;</span>Applicaiton Name<span class="kw">&gt;</span><span class="kw">:</span> Install listed application, <span class="kw">more</span> than one allowed<br />   -b or --base_dir <span class="kw">&lt;</span>Install Directory<span class="kw">&gt;</span><span class="kw">:</span> Base directroy to <span class="kw">install</span> all files under<br />   -c or --config_dir <span class="kw">&lt;</span>Config Directory<span class="kw">&gt;</span><span class="kw">:</span> Directory containin configuration files<br />   -d or --debug: Turns on debugging output is supplied<br />   -f or --config_file <span class="kw">&lt;</span>Config File<span class="kw">&gt;</span><span class="kw">:</span> The configuration <span class="kw">file</span> is used<br />   -h or --help: This massage<br />   -r or --root_user: Add to alternatives and create <span class="kw">file</span> <span class="kw">in</span> /etc/profile.d <span class="kw">for</span> the applicaitons<br />   -s or --source_dir: Directory to store/retrieve application files</code></pre>
+<h3 id="a-or---add_app"><a href="#TOC">-a or --add_app</a></h3>
+<p>This option can be used to add one or more tools to be installed. The name of a tool should exactlly match the file name in the configuration directory. Like all other options the name of the configuration directory can be configured but by default it is <code>config-files</code>. There are two additional options you can specify:</p>
+<dl>
+<dt>ALL</dt>
+<dd><p>ALL will install all all tools found in the configuration directory</p>
+</dd>
+<dt>INTERACTIVE</dt>
+<dd><p>Interactive will prompt for each tool found in the configuration directory and then install.</p>
+</dd>
+</dl>
+<h3 id="b-or---base_dir"><a href="#TOC">-b or --base_dir</a></h3>
+<p>This is the location where the tools will be installed. By default <code>$HOME/java-tools</code> if you are not root or <code>/opt/java-tools</code> if you are.</p>
+<h3 id="c-or---config_dir"><a href="#TOC">-c or --config_dir</a></h3>
+<p>The directory that contains the installation configuration files for each tool. This is <code>config-files</code> by default.</p>
+<h3 id="d-or---debug"><a href="#TOC">-d or --debug</a></h3>
+<p>This tuns on debuging which will generate a more verbose output. It is off by default.</p>
+<h3 id="f-or---config_file"><a href="#TOC">-f or --config_file</a></h3>
+<p>Rather than using command line options you can do all your configuration in configurations file. Common examples chould be for different environment like development/production or when different tools are needed on different systems for any reason. The default is to not use a configuration file.</p>
+<h3 id="h-or---help"><a href="#TOC">-h or --help</a></h3>
+<p>This will bring up the minimal help help displaying the options.</p>
+<h3 id="r-or---root_user"><a href="#TOC">-r or --root_user</a></h3>
+<p>This does two things when specified. First it sets the system up to use the <code>alternatives</code> command and second it creates scripts in <code>/etc/profile.d</code> directory for each tool that set a home environment variable and prepend to the PATH environment variable.</p>
+<h3 id="s-or---source_dir"><a href="#TOC">-s or --source_dir</a></h3>
+<p>This is the directory where source download are moved to after installation. This server two purposes:</p>
+<ul>
+<li>Keeps source if you need to install in another environment and the source in to accessable through the net.</li>
+<li>Keeps you from downloading more than once if you want to install into more than one location on your system.</li>
+</ul>
+<h2 id="examples"><a href="#TOC">Examples</a></h2>
+<p>A picture is worth a thousand words and and example is worth at least a few hundred. The examples below are for basic using covering from no options and with some of the most common options.</p>
+<h3 id="example-1"><a href="#TOC">Example 1</a></h3>
+<p>This first example is the simpelest example and without providing a configuration file or command options forces it into interactive mode. To see more of what is happening run the command with the -d or --debug option. We start by asking which tools should be installed by listing the file in the config-files directory. Then since it wasn't ran as root $HOME/java-tools was used as the installation directory. If it had been ran as root /opt/java-tools would have been used and the alternatives system would have been configured with tool specific files being added in /etc/profile.d for each tool. Since -r or --root_user wasn't used we output the PATH and HOME directory changes so you can easily cut and past them into your .bash_profile or other file of choice.</p>
+<pre class="sourceCode"><code class="sourceCode bash">./installer.sh <br />Install ant-1.8.2? [Y/n] no<br />Install elasticsearch-0.18.6? [Y/n] no<br />Install gant-1.9.7? [Y/n] <span class="kw">yes</span><br />Install gradle-1.0-m6? [Y/n] no<br />Install grails-1.3.7? [Y/n] y<br />Install grails-2.0.0? [Y/n] y<br />Install groovy-1.8.4? [Y/n] n<br /><br /><br /><span class="ot">GANT_HOME=</span>/home/nosrednakram/java-tools/gant/gant-1.9.7<br /><span class="ot">PATH=$GANT_HOME</span>/bin:<span class="ot">$PATH</span><br /><br /><span class="ot">GRAILS_HOME=</span>/home/nosrednakram/java-tools/grails/grails-1.3.7<br /><span class="ot">PATH=$GRAILS_HOME</span>/bin:<span class="ot">$PATH</span><br /><br /><span class="ot">GRAILS_HOME=</span>/home/nosrednakram/java-tools/grails/grails-2.0.0<br /><span class="ot">PATH=$GRAILS_HOME</span>/bin:<span class="ot">$PATH</span></code></pre>
+<h3 id="example-2"><a href="#TOC">Example 2</a></h3>
+<p>If you re-run the same command and provide the same options you will see that we will not overwrite and existing install and just let you know when a previously installed tool was re-requested to be installed.</p>
+<pre class="sourceCode"><code class="sourceCode bash">./installer.sh<br />Install ant-1.8.2? [Y/n] n<br />Install elasticsearch-0.18.6? [Y/n] n<br />Install gant-1.9.7? [Y/n] y<br />Install gradle-1.0-m6? [Y/n] n<br />Install grails-1.3.7? [Y/n] y<br />Install grails-2.0.0? [Y/n] y<br />Install groovy-1.8.4? [Y/n] n<br />/home/nosrednakram/java-tools/gant/gant-1.9.7 allerady exists skipping!<br />/home/nosrednakram/java-tools/grails/grails-1.3.7 allerady exists skipping!<br />/home/nosrednakram/java-tools/grails/grails-2.0.0 allerady exists skipping!</code></pre>
+<h3 id="example-3"><a href="#TOC">Example 3</a></h3>
+<p>If you want to install all applications in config_file directory you can use the -a ALL option or specifiy it in the config file. This if the output for -a ALL base on our previous environment from example 2. As you can see we have an additional note because Elastic Search requires more configuration. Currenlty I don't have previsouns for extra configuration because it's often specific to implementatin but will add if people request it.</p>
+<pre class="sourceCode"><code class="sourceCode bash">./installer.sh -a ALL<br />/home/nosrednakram/java-tools/gant/gant-1.9.7 allerady exists skipping!<br />/home/nosrednakram/java-tools/grails/grails-1.3.7 allerady exists skipping!<br />/home/nosrednakram/java-tools/grails/grails-2.0.0 allerady exists skipping!<br /><br />Additional Setup Required <span class="kw">for</span> ElasticSearch see:<br /><br />http://www.elasticsearch.org/tutorials/2010/07/01/setting-up-elasticsearch.html<br /><br /><br /><span class="ot">ANT_HOME=</span>/home/nosrednakram/java-tools/ant/apache-ant-1.8.2<br /><span class="ot">PATH=$ANT_HOME</span>/bin:<span class="ot">$PATH</span><br /><br /><span class="ot">ES_HOME=</span>/home/nosrednakram/java-tools/elasticsearch/elasticsearch-0.18.6<br /><span class="ot">PATH=$ES_HOME</span>/bin:<span class="ot">$PATH</span><br /><br /><span class="ot">GRADLE_HOME=</span>/home/nosrednakram/java-tools/gradle/gradle-1.0-milestone-6<br /><span class="ot">PATH=$GRADLE_HOME</span>/bin:<span class="ot">$PATH</span><br /><br /><span class="ot">GROOVY_HOME=</span>/home/nosrednakram/java-tools/groovy/groovy-1.8.4<br /><span class="ot">PATH=$GROOVY_HOME</span>/bin:<span class="ot">$PATH</span></code></pre>
+<h3 id="example-4"><a href="#TOC">Example 4</a></h3>
+<p>This example shows using the -r command which be default installs into <em>/opt/java-tools</em> but of corse can be overwritten. I also turn on debugging and specify a single tool on the command line.</p>
+<pre class="sourceCode"><code class="sourceCode bash"><span class="kw">sudo</span> ./installer.sh -d -r -a elasticsearch-0.18.6 <br />Installing <span class="kw">as</span> root:     TRUE<br />Debug:                  TRUE<br />Config File:            <br />Install Config <span class="kw">dir</span>      config-files<br />Installing Into:        /opt/java-tools<br />Where to store source:  source-files<br />Installing Apps:<br />    elasticsearch-0.18.6<br />Installing elasticsearch-0.18.6 .....<br />Appending APP_NOTES to ALL_NOTES<br />Verifying Required variables from config files<br /><br />Additional Setup Required <span class="kw">for</span> ElasticSearch see:<br /><br />http://www.elasticsearch.org/tutorials/2010/07/01/setting-up-elasticsearch.html</code></pre>
+<p>The previous command also created prifile scripts in /etc/profile.d.</p>
+<p><strong>elasticsearch.sh</strong></p>
+<pre class="sourceCode"><code class="sourceCode bash"><span class="kw">cat</span> /etc/profile.d/elasticsearch.sh <br /><span class="co">#</span><br /><span class="co"># elasticsearch configuration script</span><br /><span class="co">#</span><br /><span class="co"># This script is meant to be used with the alternatives system.</span><br /><span class="co">#</span><br /><span class="ot">ES_HOME=</span>/etc/alternatives/elasticsearchhome<br /><span class="ot">PATH=$ES_HOME</span>/bin:<span class="ot">$PATH</span><br /><span class="kw">export</span> <span class="ot">ES_HOME</span> <span class="ot">PATH</span></code></pre>
+<p><strong>elasticsearch.csh</strong></p>
+<pre class="sourceCode"><code class="sourceCode bash"><span class="kw">cat</span> /etc/profile.d/elasticsearch.csh <br /><span class="co">#</span><br /><span class="co"># elasticsearch configuration script</span><br /><span class="co">#</span><br /><span class="co"># This script is meant to be used with the alternatives system.</span><br /><span class="co">#</span><br />setenv ES_HOME /etc/alternatives/elasticsearchhome<br />setenv <span class="ot">PATH=$ES_HOME</span>/bin:<span class="ot">$PATH</span></code></pre>
+<p>Display <strong>alternatives</strong></p>
+<pre class="sourceCode"><code class="sourceCode bash">alternatives --display elasticsearchhome<br />elasticsearchhome - status is auto.<br /> <span class="kw">link</span> currently points to /opt/java-tools/elasticsearch/elasticsearch-0.18.6<br />/opt/java-tools/elasticsearch/elasticsearch-0.18.6 - priority 186<br />Current <span class="kw">`</span>best<span class="st">' version is /opt/java-tools/elasticsearch/elasticsearch-0.18.6.</span></code></pre>
+<h2 id="tool-specification"><a href="#TOC">Tool Specification</a></h2>
+<p>The file name is used to identify the tool and version to install . Below is the source for the <code>grails-2.0.0</code> installer configuration. Each of the options in the configuration file are required. Any optional parameters will be covered below. You need to export any variable you set so they are available to the installer script.</p>
+<pre class="sourceCode"><code class="sourceCode bash"><span class="ot">APP_NAME=</span>grails<br /><span class="ot">ENV_VAR=</span>GRAILS_HOME<br /><span class="ot">GET_CMD=</span><span class="st">'wget http://dist.springframework.org.s3.amazonaws.com/release/GRAILS/grails-2.0.0.zip'</span><br /><span class="ot">APP_FILE=</span>grails-2.0.0.zip<br /><span class="ot">EXTRACT_DIR=</span>grails-2.0.0<br /><span class="ot">EXTRACT_CMD=</span><span class="st">&quot;unzip -q </span><span class="ot">$APP_FILE</span><span class="st">&quot;</span><br /><span class="ot">ALTERNATIVES_VERSION=</span>2009<br /><br /><span class="kw">export</span> <span class="ot">APP_NAME</span> <span class="ot">ENV_VAR</span> <span class="ot">GET_CMD</span> <span class="ot">APP_FILE</span> <span class="ot">EXTRACT_DIR</span> <span class="ot">EXTRACT_CMD</span> <span class="ot">ALTERNATIVES_VERSION</span></code></pre>
+<h3 id="app_name"><a href="#TOC">APP_NAME</a></h3>
+<p>This is the name of a primary application and should mach for all versions of the same tool. It's used to create a subdirectory under the root install directory to put all related versions into.</p>
+<h3 id="env_var"><a href="#TOC">ENV_VAR</a></h3>
+<p>The environment variable to set that point to where the tool is installed.</p>
+<h3 id="get_cmd"><a href="#TOC">GET_CMD</a></h3>
+<p>The command to execute to get the source file down. Typically wget or curl.</p>
+<h3 id="app_file"><a href="#TOC">APP_FILE</a></h3>
+<p>The name of the file that is downloaded so we can uncompress it.</p>
+<h3 id="extract_dir"><a href="#TOC">EXTRACT_DIR</a></h3>
+<p>The directory the APP_FILE creates when extracted.</p>
+<h3 id="extract_cmd"><a href="#TOC">EXTRACT_CMD</a></h3>
+<p>The command that will extract the source file.</p>
+<h3 id="alternatives_version"><a href="#TOC">ALTERNATIVES_VERSION</a></h3>
+<p>The version number to register the application with. It must be an intiger and not start with a zero.</p>
+<h3 id="app_notes"><a href="#TOC">APP_NOTES</a></h3>
+<p>The APP_NOTES are displayed after the installations are finished. They are displayed with the <strong>-e</strong> option to echo so use escape characters for line feeds, tabs etc.</p>
+<h2 id="configuration-file"><a href="#TOC">Configuration File</a></h2>
+<p>You can create configuration files to help you run the script the same way every time if you would like. You specify the configuration file to use with the -f or --config_file option. Below is an example file I included as java-conf to help get you started.</p>
+<pre class="sourceCode"><code class="sourceCode bash"><span class="co">#</span><br /><span class="co"># Basic Configuration file example</span><br /><span class="co">#</span><br /><span class="co"># The Options__base_dir is where you want the root of the tools install directory.</span><br /><span class="co">#</span><br /><span class="co"># Each installable configuration file needs to be in the Options__config_dir directory</span><br /><span class="co">#</span><br /><span class="co"># Options__add_apps contains a space delimited list of applictions, if you want to install</span><br /><span class="co"># everything from the APP_CONFIG_DIR you can set it to ALL or to INTERACTIVE if you</span><br /><span class="co"># prefer to be prompted based on the configuration files in the APP_CONFIG_DIR.</span><br /><span class="co">#</span><br /><span class="co"># If Options__debug is set to TRUE debugging processing is output to the screen.</span><br /><span class="co">#</span><br /><span class="co"># Options__source_dir is where the downloaded source will be stored when finished.</span><br /><span class="co">#</span><br /><span class="co"># Options__root_user if set to TRUE will install as root and add to alternatives as</span><br /><span class="co"># well as adding profile scripts in /etc/profile.d</span><br /><span class="co">#</span><br /><span class="ot">Options__add_apps=</span>ALL<br /><span class="ot">Options__base_dir=</span>/opt/java-tools<br /><span class="ot">Options__config_dir=</span>config-files<br /><span class="ot">Options__debug=</span>TRUE<br /><span class="ot">Options__source_dir=</span>source-files<br /><span class="ot">Options__root_user=</span>FALSE<br /><br /><span class="kw">export</span> <span class="ot">Options__add_apps</span> <span class="ot">Options__base_dir</span> <span class="ot">Options__config_dir</span> <span class="ot">Options__debug</span> <span class="ot">Options__source_dir</span> <span class="ot">Options__root_user</span></code></pre>
+<h1 id="appendix-a-tools"><a href="#TOC">Appendix A (tools)</a></h1>
+<p>Below is a list of the tools I used while working on this project. You <strong>do not</strong> need to insall any of them. This list is included for others who are looking for development tools.</p>
+<dl>
+<dt>Fedora Linux <a href="http://fedoraproject.org/"><code class="url">http://fedoraproject.org/</code></a></dt>
+<dd><p>Base OS I am developed this script on.</p>
+</dd>
+<dt>pandoc <a href="http://johnmacfarlane.net/pandoc/index.html"><code class="url">http://johnmacfarlane.net/pandoc/index.html</code></a></dt>
+<dd><p>Tool for generating documentation in several formats.</p>
+</dd>
+<dt>Adaptive CSS <a href="http://adapt.960.gs/"><code class="url">http://adapt.960.gs/</code></a></dt>
+<dd><p>I use this to make the html documentation pages scale dynamically and look consistant.</p>
+</dd>
+<dt>vim <a href="http://www.vim.org/"><code class="url">http://www.vim.org/</code></a></dt>
+<dd><p>The code and documentation was primaryilly edited in vim.</p>
+</dd>
+<dt>gedit <a href="http://projects.gnome.org/gedit/"><code class="url">http://projects.gnome.org/gedit/</code></a></dt>
+<dd><p>Text editor used to do some minor editing of the documentation.</p>
+</dd>
+<dt>bash <a href="http://www.gnu.org/software/bash/"><code class="url">http://www.gnu.org/software/bash/</code></a></dt>
+<dd><p>The shell I wrote this in, and use when available.</p>
+</dd>
+<dt>alternatives <a href="http://dailypackage.fedorabook.com/index.php?/archives/6-Wednesday-Why-The-Alternatives-System.html"><code class="url">http://dailypackage.fedorabook.com/index.php?/archives/6-Wednesday-Why-The-Alternatives-System.html</code></a></dt>
+<dd><p>Optioanlly you can install java applications to use the alternatives system.</p>
+</dd>
+</dl>
+</div> <!-- grid 9 -->
+</div> <!-- Containter 12 -->
+</body>
+</html>
