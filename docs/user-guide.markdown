@@ -282,7 +282,7 @@ No script name specified. Use 'grails help' for more info or 'grails interactive
 ~~~~~~~~~~~~~~~~~~~~
 
 This works because GRAILS_HOME points to /usr/lib/grails_home and the PATH points to
-/usr/lib/grails_home/bin.  There is an additional linkd is /etc alternatives so
+/usr/lib/grails_home/bin.  There is an additional link in /etc alternatives so
 /usr/lib/grails_home points to /etc/alternatives/grailshome which in turn points to 
 the actual location of the selected version.
 
