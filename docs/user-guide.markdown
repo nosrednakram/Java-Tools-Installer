@@ -223,7 +223,7 @@ cat /etc/profile.d/elasticsearch.sh
 #
 # This script is meant to be used with the alternatives system.
 #
-ES_HOME=/etc/alternatives/elasticsearchhome
+ES_HOME=/usr/lib/elasticsearch_home
 PATH=$ES_HOME/bin:$PATH
 export ES_HOME PATH
 ~~~~~~~~~~~~~~~~~~~~~
@@ -237,7 +237,7 @@ cat /etc/profile.d/elasticsearch.csh
 #
 # This script is meant to be used with the alternatives system.
 #
-setenv ES_HOME /etc/alternatives/elasticsearchhome
+setenv ES_HOME /usr/lib/elasticsearch_home
 setenv PATH=$ES_HOME/bin:$PATH
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -250,6 +250,62 @@ elasticsearchhome - status is auto.
 /opt/java-tools/elasticsearch/elasticsearch-0.18.6 - priority 186
 Current `best' version is /opt/java-tools/elasticsearch/elasticsearch-0.18.6.
 ~~~~~~~~~~~~~~~~~~~~~
+
+## Using Alternatives ##
+
+Unlike java and other tools installed by the system we simply set the \*_HOME 
+variable and prepend \*_HOME/bin to the PATH.  Where java uses alternitives to
+link the binaries into /usr/bin.  I believe my approach is simpler and makes
+it very simple to change version as demonstrated below.  
+
+~~~~~~~~~~~~~~~~~~~~{.bash}
+[nosrednakram@localhost docs]$ grails -version
+
+Grails version: 2.0.0
+[nosrednakram@localhost docs]$ sudo alternatives --config grailshome
+
+There are 3 programs which provide 'grailshome'.
+
+  Selection    Command
+-----------------------------------------------
+   1           /opt/java-tools/grails/grails-1.3.7
+   2           /opt/java-tools/grails/grails-2.0.0.RC3
+*+ 3           /opt/java-tools/grails/grails-2.0.0
+
+Enter to keep the current selection[+], or type selection number: 1
+[nosrednakram@localhost docs]$ grails
+Welcome to Grails 1.3.7 - http://grails.org/
+Licensed under Apache Standard License 2.0
+Grails home is set to: /usr/lib/grails_home
+
+No script name specified. Use 'grails help' for more info or 'grails interactive' to enter interactive mode
+~~~~~~~~~~~~~~~~~~~~
+
+This works because GRAILS_HOME points to /usr/lib/grails_home and the PATH points to
+/usr/lib/grails_home/bin.  There is an additional linkd is /etc alternatives so
+/usr/lib/grails_home points to /etc/alternatives/grailshome which in turn points to 
+the actual location of the selected version.
+
+~~~~~~~~~~~~~~
+[nosrednakram@localhost docs]$ ll /usr/lib/grails_home
+lrwxrwxrwx. 1 root root 28 Jan  3 06:51 /usr/lib/grails_home -> /etc/alternatives/grailshome
+[nosrednakram@localhost docs]$ ll /etc/alternatives/grailshome
+lrwxrwxrwx. 1 root root 35 Jan  3 06:51 /etc/alternatives/grailshome -> /opt/java-tools/grails/grails-1.3.7
+[nosrednakram@localhost docs]$ sudo alternatives --config grailshome
+
+There are 3 programs which provide 'grailshome'.
+
+  Selection    Command
+-----------------------------------------------
+ + 1           /opt/java-tools/grails/grails-1.3.7
+   2           /opt/java-tools/grails/grails-2.0.0.RC3
+*  3           /opt/java-tools/grails/grails-2.0.0
+
+Enter to keep the current selection[+], or type selection number: 3
+[nosrednakram@localhost docs]$ ll /etc/alternatives/grailshome
+lrwxrwxrwx. 1 root root 35 Jan  3 06:54 /etc/alternatives/grailshome -> /opt/java-tools/grails/grails-2.0.0
+
+~~~~~~~~~~~~~~
 
 ## Tool Specification ##
 

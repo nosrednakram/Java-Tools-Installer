@@ -90,6 +90,7 @@ var ADAPT_CONFIG = {
 <li><a href="#example-3">Example 3</a></li>
 <li><a href="#example-4">Example 4</a></li>
 </ul></li>
+<li><a href="#using-alternatives">Using Alternatives</a></li>
 <li><a href="#tool-specification">Tool Specification</a><ul>
 <li><a href="#app_name">APP_NAME</a></li>
 <li><a href="#env_var">ENV_VAR</a></li>
@@ -204,11 +205,33 @@ var ADAPT_CONFIG = {
 <pre class="sourceCode"><code class="sourceCode bash"><span class="kw">sudo</span> ./installer.sh -d -r -a elasticsearch-0.18.6 <br />Installing <span class="kw">as</span> root:     TRUE<br />Debug:                  TRUE<br />Config File:            <br />Install Config <span class="kw">dir</span>      config-files<br />Installing Into:        /opt/java-tools<br />Where to store source:  source-files<br />Installing Apps:<br />    elasticsearch-0.18.6<br />Installing elasticsearch-0.18.6 .....<br />Appending APP_NOTES to ALL_NOTES<br />Verifying Required variables from config files<br /><br />Additional Setup Required <span class="kw">for</span> ElasticSearch see:<br /><br />http://www.elasticsearch.org/tutorials/2010/07/01/setting-up-elasticsearch.html</code></pre>
 <p>The previous command also created prifile scripts in /etc/profile.d.</p>
 <p><strong>elasticsearch.sh</strong></p>
-<pre class="sourceCode"><code class="sourceCode bash"><span class="kw">cat</span> /etc/profile.d/elasticsearch.sh <br /><span class="co">#</span><br /><span class="co"># elasticsearch configuration script</span><br /><span class="co">#</span><br /><span class="co"># This script is meant to be used with the alternatives system.</span><br /><span class="co">#</span><br /><span class="ot">ES_HOME=</span>/etc/alternatives/elasticsearchhome<br /><span class="ot">PATH=$ES_HOME</span>/bin:<span class="ot">$PATH</span><br /><span class="kw">export</span> <span class="ot">ES_HOME</span> <span class="ot">PATH</span></code></pre>
+<pre class="sourceCode"><code class="sourceCode bash"><span class="kw">cat</span> /etc/profile.d/elasticsearch.sh <br /><span class="co">#</span><br /><span class="co"># elasticsearch configuration script</span><br /><span class="co">#</span><br /><span class="co"># This script is meant to be used with the alternatives system.</span><br /><span class="co">#</span><br /><span class="ot">ES_HOME=</span>/usr/lib/elasticsearch_home<br /><span class="ot">PATH=$ES_HOME</span>/bin:<span class="ot">$PATH</span><br /><span class="kw">export</span> <span class="ot">ES_HOME</span> <span class="ot">PATH</span></code></pre>
 <p><strong>elasticsearch.csh</strong></p>
-<pre class="sourceCode"><code class="sourceCode bash"><span class="kw">cat</span> /etc/profile.d/elasticsearch.csh <br /><span class="co">#</span><br /><span class="co"># elasticsearch configuration script</span><br /><span class="co">#</span><br /><span class="co"># This script is meant to be used with the alternatives system.</span><br /><span class="co">#</span><br />setenv ES_HOME /etc/alternatives/elasticsearchhome<br />setenv <span class="ot">PATH=$ES_HOME</span>/bin:<span class="ot">$PATH</span></code></pre>
+<pre class="sourceCode"><code class="sourceCode bash"><span class="kw">cat</span> /etc/profile.d/elasticsearch.csh <br /><span class="co">#</span><br /><span class="co"># elasticsearch configuration script</span><br /><span class="co">#</span><br /><span class="co"># This script is meant to be used with the alternatives system.</span><br /><span class="co">#</span><br />setenv ES_HOME /usr/lib/elasticsearch_home<br />setenv <span class="ot">PATH=$ES_HOME</span>/bin:<span class="ot">$PATH</span></code></pre>
 <p>Display <strong>alternatives</strong></p>
 <pre class="sourceCode"><code class="sourceCode bash">alternatives --display elasticsearchhome<br />elasticsearchhome - status is auto.<br /> <span class="kw">link</span> currently points to /opt/java-tools/elasticsearch/elasticsearch-0.18.6<br />/opt/java-tools/elasticsearch/elasticsearch-0.18.6 - priority 186<br />Current <span class="kw">`</span>best<span class="st">' version is /opt/java-tools/elasticsearch/elasticsearch-0.18.6.</span></code></pre>
+<h2 id="using-alternatives"><a href="#TOC">Using Alternatives</a></h2>
+<p>Unlike java and other tools installed by the system we simply set the *_HOME variable and prepend *_HOME/bin to the PATH. Where java uses alternitives to link the binaries into /usr/bin. I believe my approach is simpler and makes it very simple to change version as demonstrated below.</p>
+<pre class="sourceCode"><code class="sourceCode bash">[nosrednakram@localhost docs]$ grails -version<br /><br />Grails version: 2.0.0<br />[nosrednakram@localhost docs]$ <span class="kw">sudo</span> alternatives --config grailshome<br /><br />There are 3 programs <span class="kw">which</span> provide <span class="st">'grailshome'</span>.<br /><br />  Selection    Command<br />-----------------------------------------------<br />   1           /opt/java-tools/grails/grails-1.3.7<br />   2           /opt/java-tools/grails/grails-2.0.0.RC3<br />*+ 3           /opt/java-tools/grails/grails-2.0.0<br /><br />Enter to keep the current selection[+], or <span class="kw">type</span> selection number: 1<br />[nosrednakram@localhost docs]$ grails<br />Welcome to Grails 1.3.7 - http://grails.org/<br />Licensed under Apache Standard License 2.0<br />Grails home is <span class="kw">set</span> to: /usr/lib/grails_home<br /><br />No script name specified<span class="kw">.</span> Use <span class="st">'grails help'</span> <span class="kw">for</span> <span class="kw">more</span> info or <span class="st">'grails interactive'</span> to enter interactive mode</code></pre>
+<p>This works because GRAILS_HOME points to /usr/lib/grails_home and the PATH points to /usr/lib/grails_home/bin. There is an additional linkd is /etc alternatives so /usr/lib/grails_home points to /etc/alternatives/grailshome which in turn points to the actual location of the selected version.</p>
+<pre><code>[nosrednakram@localhost docs]$ ll /usr/lib/grails_home
+lrwxrwxrwx. 1 root root 28 Jan  3 06:51 /usr/lib/grails_home -&gt; /etc/alternatives/grailshome
+[nosrednakram@localhost docs]$ ll /etc/alternatives/grailshome
+lrwxrwxrwx. 1 root root 35 Jan  3 06:51 /etc/alternatives/grailshome -&gt; /opt/java-tools/grails/grails-1.3.7
+[nosrednakram@localhost docs]$ sudo alternatives --config grailshome
+
+There are 3 programs which provide 'grailshome'.
+
+  Selection    Command
+-----------------------------------------------
+ + 1           /opt/java-tools/grails/grails-1.3.7
+   2           /opt/java-tools/grails/grails-2.0.0.RC3
+*  3           /opt/java-tools/grails/grails-2.0.0
+
+Enter to keep the current selection[+], or type selection number: 3
+[nosrednakram@localhost docs]$ ll /etc/alternatives/grailshome
+lrwxrwxrwx. 1 root root 35 Jan  3 06:54 /etc/alternatives/grailshome -&gt; /opt/java-tools/grails/grails-2.0.0
+</code></pre>
 <h2 id="tool-specification"><a href="#TOC">Tool Specification</a></h2>
 <p>The file name is used to identify the tool and version to install . Below is the source for the <code>grails-2.0.0</code> installer configuration. Each of the options in the configuration file are required. Any optional parameters will be covered below. You need to export any variable you set so they are available to the installer script.</p>
 <pre class="sourceCode"><code class="sourceCode bash"><span class="ot">APP_NAME=</span>grails<br /><span class="ot">ENV_VAR=</span>GRAILS_HOME<br /><span class="ot">GET_CMD=</span><span class="st">'wget http://dist.springframework.org.s3.amazonaws.com/release/GRAILS/grails-2.0.0.zip'</span><br /><span class="ot">APP_FILE=</span>grails-2.0.0.zip<br /><span class="ot">EXTRACT_DIR=</span>grails-2.0.0<br /><span class="ot">EXTRACT_CMD=</span><span class="st">&quot;unzip -q </span><span class="ot">$APP_FILE</span><span class="st">&quot;</span><br /><span class="ot">ALTERNATIVES_VERSION=</span>2009<br /><br /><span class="kw">export</span> <span class="ot">APP_NAME</span> <span class="ot">ENV_VAR</span> <span class="ot">GET_CMD</span> <span class="ot">APP_FILE</span> <span class="ot">EXTRACT_DIR</span> <span class="ot">EXTRACT_CMD</span> <span class="ot">ALTERNATIVES_VERSION</span></code></pre>

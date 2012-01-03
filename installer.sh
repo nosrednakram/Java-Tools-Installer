@@ -318,7 +318,7 @@ for app in $Options__add_apps; do
 			#
 			# This script is meant to be used with the alternatives system.
 			#
-			$ENV_VAR=/etc/alternatives/${APP_NAME}home
+			$ENV_VAR=/usr/lib/${APP_NAME}_home
 			PATH=\$$ENV_VAR/bin:\$PATH
 			export $ENV_VAR PATH
 			EOS
@@ -331,7 +331,7 @@ for app in $Options__add_apps; do
 			#
 			# This script is meant to be used with the alternatives system.
 			#
-			setenv $ENV_VAR /etc/alternatives/${APP_NAME}home
+			setenv $ENV_VAR /usr/lib/${APP_NAME}_home
 			setenv PATH=\$$ENV_VAR/bin:\$PATH
 			EOS
 	    fi
