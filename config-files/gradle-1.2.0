@@ -1,0 +1,9 @@
+APP_NAME=gradle
+ENV_VAR=GRADLE_HOME
+GET_CMD='wget http://services.gradle.org/distributions/gradle-1.2-all.zip'
+APP_FILE=gradle-1.2-all.zip
+EXTRACT_CMD="unzip -q $APP_FILE"
+EXTRACT_DIR=gradle-1.2-all
+ALTERNATIVES_VERSION=120
+
+export APP_NAME ENV_VAR GET_CMD APP_FILE EXTRACT_DIR EXTRACT_CMD ALTERNATIVES_VERSION
